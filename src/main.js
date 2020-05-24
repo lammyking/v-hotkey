@@ -3,7 +3,6 @@ import { getKeyMap } from './keycodes'
 function bindEvent (el, { value, modifiers }, alias) {
   el._keymap = getKeyMap(value, alias)
   el._keyHandler = e => {
-    if (modifiers.prevent) e.preventDefault()
     if (modifiers.stop) {
       const { nodeName, isContentEditable } = document.activeElement
       if (isContentEditable) return
@@ -23,7 +22,10 @@ function bindEvent (el, { value, modifiers }, alias) {
         !!hotkey.shift === e.shiftKey &&
         !!hotkey.meta === e.metaKey &&
         hotkey.callback[e.type]
-      callback && callback(e)
+	if (callback) {
+	  callback(e);
+	  modifiers.prevent && e.preventDefault();
+	}
     }
   }
   document.addEventListener('keydown', el._keyHandler)
